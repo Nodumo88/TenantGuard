@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TenantGuard - Secure Housing Rights Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Inter Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar styling for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <!-- Navigation Header -->
+    <header class="bg-slate-900 text-white sticky top-0 z-40 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+                <div class="bg-emerald-600 p-2 rounded-lg text-white">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
+                </div>
+                <div>
+                    <span class="font-bold text-xl tracking-tight">Tenant<span class="text-emerald-500">Guard</span></span>
+                    <span class="hidden sm:inline-block bg-slate-800 text-slate-400 text-xs px-2 py-0.5 rounded-full ml-2">v1.1 Active Protection</span>
+                </div>
+            </div>
+            
+            <nav class="hidden md:flex space-x-1">
+                <button onclick="switchTab('dashboard')" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition duration-150 active" id="tab-dashboard">
+                    <i class="fa-solid fa-chart-line mr-1.5 text-emerald-500"></i> Dashboard
+                </button>
+                <button onclick="switchTab('new-dispute')" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition duration-150" id="tab-new-dispute">
+                    <i class="fa-solid fa-plus mr-1.5 text-emerald-500"></i> Log Issue
+                </button>
+                <button onclick="switchTab('library')" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition duration-150" id="tab-library">
+                    <i class="fa-solid fa-book-bookmark mr-1.5 text-emerald-500"></i> Statute Library
+                </button>
+                <button onclick="switchTab('advisor')" class="nav-tab px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition duration-150" id="tab-advisor">
+                    <i class="fa-solid fa-user-tie mr-1.5 text-emerald-500"></i> Legal Advisor Match
+                </button>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <span class="hidden lg:inline-flex items-center bg-emerald-950 text-emerald-400 text-xs font-semibold px-3 py-1.5 rounded-full border border-emerald-900">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping mr-2"></span> System Online
+                </span>
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-full bg-slate-700 text-slate-300 flex items-center justify-center font-bold text-sm">
+                        TA
+                    </div>
+                    <span class="hidden md:inline-block text-sm font-medium text-slate-300">Tenant Account</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Custom Alerts Notification Banner -->
+    <div id="toast-banner" class="hidden fixed bottom-5 right-5 z-50 max-w-sm w-full bg-slate-900 border-l-4 border-emerald-500 shadow-2xl rounded-lg p-4 text-white flex items-start space-x-3 transition duration-300 transform translate-y-0">
+        <div class="text-emerald-500 mt-0.5">
+            <i class="fa-solid fa-circle-check text-lg"></i>
+        </div>
+        <div class="flex-1">
+            <h4 class="font-semibold text-sm" id="toast-title">Success</h4>
+            <p class="text-xs text-slate-400 mt-1" id="toast-message">Operation completed successfully.</p>
+        </div>
+        <button onclick="hideToast()" class="text-slate-400 hover:text-white text-xs">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- ==================== DASHBOARD TAB ==================== -->
+        <div id="tab-content-dashboard" class="space-y-8 tab-panel">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Active Tenant Protection</h1>
+                    <p class="text-slate-500 text-sm mt-1">Legally enforce your housing rights, build paper trails, and monitor statutory deadlines.</p>
+                </div>
+                <button onclick="switchTab('new-dispute')" class="inline-flex items-center bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-lg shadow-sm transition duration-150">
+                    <i class="fa-solid fa-file-circle-plus mr-2"></i> Log New Housing Issue
+                </button>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-amber-50 rounded-lg text-amber-600">
+                        <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="block text-slate-400 text-xs font-semibold uppercase tracking-wider">Active Issues</span>
+                        <span class="text-2xl font-bold text-slate-900 mt-1" id="stat-active">2</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-emerald-50 rounded-lg text-emerald-600">
+                        <i class="fa-solid fa-circle-check text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="block text-slate-400 text-xs font-semibold uppercase tracking-wider">Resolved Issues</span>
+                        <span class="text-2xl font-bold text-slate-900 mt-1" id="stat-resolved">1</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-blue-50 rounded-lg text-blue-600">
+                        <i class="fa-solid fa-envelope-circle-check text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="block text-slate-400 text-xs font-semibold uppercase tracking-wider">Letters Sent</span>
+                        <span class="text-2xl font-bold text-slate-900 mt-1" id="stat-sent">2</span>
+                    </div>
+                </div>
+
+                <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center space-x-4">
+                    <div class="p-3 bg-rose-50 rounded-lg text-rose-600">
+                        <i class="fa-solid fa-hourglass-half text-xl"></i>
+                    </div>
+                    <div>
+                        <span class="block text-slate-400 text-xs font-semibold uppercase tracking-wider">Escalation Ready</span>
+                        <span class="text-2xl font-bold text-slate-900 mt-1" id="stat-escalated">1</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Disputes List -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Left Section: Main disputes feed -->
+                <div class="lg:col-span-2 space-y-6">
+                    <h3 class="font-bold text-lg text-slate-900 flex items-center">
+                        <i class="fa-solid fa-list-check mr-2 text-emerald-600"></i> Your Dispute Log & Statutory Clocks
+                    </h3>
+                    
+                    <div id="disputes-list-container" class="space-y-4">
+                        <!-- Disputes cards injected here dynamically -->
+                    </div>
+                </div>
+
+                <!-- Right Section: Sidebar with simulated helper & metrics -->
+                <div class="space-y-6">
+                    <!-- Landlord Response Simulator Panel -->
+                    <div class="bg-slate-900 text-white rounded-2xl p-6 shadow-xl border border-slate-800">
+                        <h4 class="font-bold text-md text-emerald-400 uppercase tracking-wider flex items-center">
+                            <i class="fa-solid fa-flask-vial mr-2"></i> Landlord Action Simulator
+                        </h4>
+                        <p class="text-xs text-slate-400 mt-2">
+                            Simulate how the landlord responds to your legal letters. Watch how TenantGuard automatically calculates safety statuses, shifts milestones, and highlights legal escalation options.
+                        </p>
+
+                        <div class="mt-4 space-y-4">
+                            <div>
+                                <label class="block text-xs text-slate-400 mb-1 font-semibold">Select Target Dispute:</label>
+                                <select id="simulator-target-id" class="w-full bg-slate-800 text-white rounded-lg p-2 text-xs border border-slate-700 focus:outline-none focus:border-emerald-500">
+                                    <!-- Dynamic select options -->
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-2 pt-2">
+                                <button onclick="triggerSimulatorAction('ignore')" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium py-2 px-3 rounded-lg flex items-center justify-center border border-slate-700">
+                                    <i class="fa-solid fa-volume-mute mr-1 text-slate-400"></i> Ignore Dispute
+                                </button>
+                                <button onclick="triggerSimulatorAction('comply')" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium py-2 px-3 rounded-lg flex items-center justify-center border border-slate-700">
+                                    <i class="fa-solid fa-handshake-angle mr-1 text-emerald-500"></i> Comply / Fix
+                                </button>
+                                <button onclick="triggerSimulatorAction('object')" class="bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium py-2 px-3 rounded-lg flex items-center justify-center border border-slate-700">
+                                    <i class="fa-solid fa-circle-nodes mr-1 text-amber-500"></i> Object / Dispute
+                                </button>
+                                <button onclick="triggerSimulatorAction('threaten')" class="bg-rose-950 hover:bg-rose-900 text-rose-200 text-xs font-medium py-2 px-3 rounded-lg flex items-center justify-center border border-rose-900">
+                                    <i class="fa-solid fa-circle-exclamation mr-1 text-rose-500"></i> Threaten / Evict
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Protection Advisor Guidance -->
+                    <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-900 text-sm uppercase tracking-wider flex items-center">
+                            <i class="fa-solid fa-clipboard-question mr-2 text-emerald-600"></i> Active Protection Protocol
+                        </h4>
+                        
+                        <div class="text-xs text-slate-500 space-y-3">
+                            <div class="flex items-start space-x-2">
+                                <span class="bg-slate-100 text-slate-700 font-bold rounded-full w-4 h-4 flex items-center justify-center text-[10px] mt-0.5">1</span>
+                                <p><strong>Do not use informal texts:</strong> Informal texts are easily denied or ignored in legal disputes. Always export formal PDF/Word templates.</p>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <span class="bg-slate-100 text-slate-700 font-bold rounded-full w-4 h-4 flex items-center justify-center text-[10px] mt-0.5">2</span>
+                                <p><strong>Track deadlines carefully:</strong> Landlords have exact statutory time windows to respond to Section 11 and Section 97 notices before you can legally call local council surveyors.</p>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <span class="bg-slate-100 text-slate-700 font-bold rounded-full w-4 h-4 flex items-center justify-center text-[10px] mt-0.5">3</span>
+                                <p><strong>Document everything:</strong> Keep logs of phone calls, screenshot your bills, and take photos of all damage in our Log wizard.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== NEW DISPUTE WIZARD TAB ==================== -->
+        <div id="tab-content-new-dispute" class="space-y-6 tab-panel hidden">
+            <div class="max-w-3xl mx-auto bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+                <div class="bg-slate-900 p-6 text-white flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-bold">Document & Enforce a New Issue</h2>
+                        <p class="text-xs text-slate-400 mt-1">TenantGuard will find the matching UK statute and generate a binding legal document.</p>
+                    </div>
+                    <div class="text-emerald-500 text-2xl">
+                        <i class="fa-solid fa-shield-cat"></i>
+                    </div>
+                </div>
+
+                <div class="p-6 sm:p-8 space-y-6">
+                    <form id="dispute-form" onsubmit="handleNewDisputeSubmit(event)" class="space-y-6">
+                        
+                        <!-- Step 1: Issue Category Selection -->
+                        <div class="space-y-3">
+                            <label class="block text-sm font-semibold text-slate-800">1. What category of issue are you facing?</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <label class="border-2 border-slate-200 hover:border-emerald-500 rounded-xl p-4 flex items-start space-x-3 cursor-pointer transition duration-150 relative">
+                                    <input type="radio" name="category" value="repairs" checked class="mt-1 accent-emerald-600 focus:ring-emerald-500">
+                                    <div>
+                                        <span class="block font-bold text-sm text-slate-900">Urgent Repairs / Damp</span>
+                                        <span class="block text-xs text-slate-500 mt-1">Mold, broken boiler, leaking pipes, structural hazards.</span>
+                                        <span class="inline-block mt-2 text-[10px] bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded-full">Sec. 11, Landlord & Tenant Act 1985</span>
+                                    </div>
+                                </label>
+
+                                <label class="border-2 border-slate-200 hover:border-emerald-500 rounded-xl p-4 flex items-start space-x-3 cursor-pointer transition duration-150 relative">
+                                    <input type="radio" name="category" value="eviction" class="mt-1 accent-emerald-600 focus:ring-emerald-500">
+                                    <div>
+                                        <span class="block font-bold text-sm text-slate-900">Eviction / Harassment Threat</span>
+                                        <span class="block text-xs text-slate-500 mt-1">Notice of seeking possession, informal text threats, landlord access.</span>
+                                        <span class="inline-block mt-2 text-[10px] bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded-full">Sec. 21 / Sec. 8 Protection</span>
+                                    </div>
+                                </label>
+
+                                <label class="border-2 border-slate-200 hover:border-emerald-500 rounded-xl p-4 flex items-start space-x-3 cursor-pointer transition duration-150 relative">
+                                    <input type="radio" name="category" value="rent" class="mt-1 accent-emerald-600 focus:ring-emerald-500">
+                                    <div>
+                                        <span class="block font-bold text-sm text-slate-900">Rent Increase Dispute</span>
+                                        <span class="block text-xs text-slate-500 mt-1">Sudden rent hikes, lack of official Form 4 notification templates.</span>
+                                        <span class="inline-block mt-2 text-[10px] bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded-full">Sec. 13, Housing Act 1988</span>
+                                    </div>
+                                </label>
+
+                                <label class="border-2 border-slate-200 hover:border-emerald-500 rounded-xl p-4 flex items-start space-x-3 cursor-pointer transition duration-150 relative">
+                                    <input type="radio" name="category" value="refurb" class="mt-1 accent-emerald-600 focus:ring-emerald-500">
+                                    <div>
+                                        <span class="block font-bold text-sm text-slate-900">Refurbishment Consent</span>
+                                        <span class="block text-xs text-slate-500 mt-1">Tenant-led alterations, request formal written council/landlord permission.</span>
+                                        <span class="inline-block mt-2 text-[10px] bg-slate-100 text-slate-700 font-semibold px-2 py-0.5 rounded-full">Sec. 97, Housing Act 1985</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <hr class="border-slate-200">
+
+                        <!-- Step 2: Details & Evidence Input -->
+                        <div class="space-y-4">
+                            <label class="block text-sm font-semibold text-slate-800">2. Fill in the Details of the Case</label>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Tenant Full Name:</label>
+                                    <input type="text" id="form-tenant-name" required value="Thomas Anderson" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Tenancy Address:</label>
+                                    <input type="text" id="form-address" required value="Flat 101, Metacortex Towers, London EC1M 4BY" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Landlord / Council Name:</label>
+                                    <input type="text" id="form-landlord-name" required value="Apex Property Managers Ltd" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Landlord Contact Email:</label>
+                                    <input type="email" id="form-landlord-email" required value="management@apexproperties.co.uk" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">When did the issue start?</label>
+                                    <input type="date" id="form-issue-date" required class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Short Description Headline:</label>
+                                    <input type="text" id="form-headline" required placeholder="e.g. Toxic black mold in bathroom corner" class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Detailed Description of the Problem / History:</label>
+                                <textarea id="form-details" rows="4" required placeholder="Provide as much details as possible, including dates of verbal requests, effect on your health, damage to clothing/furniture..." class="w-full border border-slate-300 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
+                            </div>
+
+                            <!-- Upload Evidence Mock -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Upload Photo / Document Evidence (Optional):</label>
+                                <div class="border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-xl p-6 text-center cursor-pointer bg-slate-50 transition duration-150" onclick="simulateFileUpload()">
+                                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400"></i>
+                                    <span class="block text-sm font-semibold text-slate-800 mt-2">Click to select photos of damage/written notices</span>
+                                    <span class="block text-xs text-slate-500 mt-1">Drag and drop also accepted (max 10MB per image)</span>
+                                    <div id="upload-status" class="hidden text-xs text-emerald-600 font-semibold mt-2">
+                                        <i class="fa-solid fa-check-double mr-1"></i> Evidence loaded: <span id="uploaded-filename">mold_damage_photos.jpg</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-end space-x-3 pt-4 border-t border-slate-200">
+                            <button type="button" onclick="switchTab('dashboard')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium px-5 py-2.5 rounded-lg transition duration-150">
+                                Cancel
+                            </button>
+                            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-2.5 rounded-lg shadow-sm transition duration-150">
+                                Generate Statute Document & Clock <i class="fa-solid fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== DOCUMENT GENERATOR TAB ==================== -->
+        <div id="tab-content-doc-viewer" class="space-y-6 tab-panel hidden">
+            <div class="flex flex-col md:flex-row items-center md:justify-between space-y-4 md:space-y-0">
+                <div>
+                    <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Statutory Document Draft</h1>
+                    <p class="text-slate-500 text-sm mt-1">Review, copy, or print your legally aligned communication paper trail.</p>
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="switchTab('dashboard')" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium px-4 py-2 rounded-lg transition duration-150 text-sm">
+                        <i class="fa-solid fa-angle-left mr-1.5"></i> Back to Dashboard
+                    </button>
+                    <button onclick="copyDocToClipboard()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg shadow-sm transition duration-150 text-sm">
+                        <i class="fa-solid fa-copy mr-1.5"></i> Copy Document
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Document Editor Container -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden">
+                    <div class="bg-slate-900 px-6 py-4 text-white flex items-center justify-between border-b border-slate-800">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-amber-500 animate-pulse"></span>
+                            <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Draft Template Form</span>
+                        </div>
+                        <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-900 font-semibold px-2 py-0.5 rounded-full" id="doc-view-statute">Section 11, LTA 1985</span>
+                    </div>
+
+                    <!-- Editable letter box -->
+                    <div class="p-8 font-mono text-sm text-slate-800 bg-slate-50 leading-relaxed border-b border-slate-200 overflow-y-auto max-h-[600px]">
+                        <div contenteditable="true" id="editable-doc-box" class="focus:outline-none p-4 bg-white border border-slate-300 rounded-xl shadow-inner min-h-[450px]">
+                            <!-- Content generated dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-slate-100 flex items-center justify-between text-xs text-slate-500">
+                        <span><i class="fa-solid fa-pen-to-square mr-1"></i> Click inside the box to edit details directly</span>
+                        <span>Formatted under UK Statutory Guidelines</span>
+                    </div>
+                </div>
+
+                <!-- Guidance & Action Plan Sidebar -->
+                <div class="space-y-6">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
+                        <h4 class="font-bold text-slate-900 text-sm uppercase tracking-wider flex items-center border-b border-slate-200 pb-3">
+                            <i class="fa-solid fa-circle-play mr-2 text-emerald-600"></i> Next Step Actions
+                        </h4>
+
+                        <div class="space-y-4">
+                            <div class="relative pl-6 pb-2 border-l-2 border-emerald-500">
+                                <span class="absolute left-[-9px] top-0 bg-emerald-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">1</span>
+                                <h5 class="font-bold text-xs text-slate-900">Copy or Download Document</h5>
+                                <p class="text-[11px] text-slate-500 mt-1">Click "Copy Document" or print this template directly to get the physical paper draft ready.</p>
+                            </div>
+
+                            <div class="relative pl-6 pb-2 border-l-2 border-emerald-500">
+                                <span class="absolute left-[-9px] top-0 bg-emerald-500 text-white text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">2</span>
+                                <h5 class="font-bold text-xs text-slate-900">Send via Registered Email / Mail</h5>
+                                <p class="text-[11px] text-slate-500 mt-1">Send the text via email to the landlord/agency. Always request a <strong>Read Receipt</strong> to start your legal countdown clock.</p>
+                            </div>
+
+                            <div class="relative pl-6 pb-2 border-l-2 border-slate-200">
+                                <span class="absolute left-[-9px] top-0 bg-slate-300 text-slate-700 text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">3</span>
+                                <h5 class="font-bold text-xs text-slate-900">Statutory Response Waiting Period</h5>
+                                <p class="text-[11px] text-slate-500 mt-1">Under standard law, the landlord must make reasonable efforts to resolve structural/heating repairs within 14 days, and reply within 7 days for other categories.</p>
+                            </div>
+
+                            <div class="relative pl-6">
+                                <span class="absolute left-[-9px] top-0 bg-slate-300 text-slate-700 text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">4</span>
+                                <h5 class="font-bold text-xs text-slate-900">Escalate to Council (If Ignored)</h5>
+                                <p class="text-[11px] text-slate-500 mt-1">If the clock hits zero with no action, click "Escalate" on the dashboard to generate a formal Complaint package for local Environmental Health officers.</p>
+                            </div>
+                        </div>
+
+                        <div class="pt-2">
+                            <button onclick="activateDisputeClock()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 px-4 rounded-lg shadow-sm transition duration-150 text-xs text-center flex items-center justify-center">
+                                <i class="fa-solid fa-clock-pulse mr-2 text-emerald-500"></i> Activate statutory clock now
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== STATUTE LIBRARY TAB ==================== -->
+        <div id="tab-content-library" class="space-y-6 tab-panel hidden">
+            <div>
+                <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Statutory Legal Library</h1>
+                <p class="text-slate-500 text-sm mt-1">Plain-English explanations of critical United Kingdom housing acts used to defend renters.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Statute Card 1 -->
+                <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 bg-emerald-50 px-2 py-1 rounded">Repairs / Safety</span>
+                        <span class="text-xs text-slate-400">Housing Act 1985 / 1988</span>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900">Section 11, Landlord and Tenant Act 1985</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        This is the most powerful law for securing repairs. It establishes that the landlord holds the statutory obligation to keep in repair the structure and exterior of the dwelling-house (including drains, gutters, and external pipes) and keep in repair and proper working order installations for the supply of water, gas, electricity, and sanitation.
+                    </p>
+                    <div class="bg-slate-50 p-3 rounded-lg text-xs font-mono text-slate-600 border border-slate-200">
+                        <strong>Key Ruling:</strong> Landlords cannot shift repair costs to tenants or contract out of Section 11 obligations, regardless of tenancy terms.
+                    </div>
+                </div>
+
+                <!-- Statute Card 2 -->
+                <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-amber-600 bg-amber-50 px-2 py-1 rounded">Eviction Security</span>
+                        <span class="text-xs text-slate-400">Housing Act 1988</span>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900">Section 21 & Section 8 Evictions</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Under modern law, landlords must use specific statutory procedures to evict tenants. A Section 21 "no-fault" eviction must follow strict guidelines: the landlord must provide 2 months' notice, have protected the security deposit in an approved scheme, and have provided the tenant with gas safety certificates and EPC ratings before tenancy began.
+                    </p>
+                    <div class="bg-slate-50 p-3 rounded-lg text-xs font-mono text-slate-600 border border-slate-200">
+                        <strong>Key Ruling:</strong> If your landlord hasn't given you a copy of the "How to Rent" booklet and a gas safety check, any Section 21 notice is legally invalid.
+                    </div>
+                </div>
+
+                <!-- Statute Card 3 -->
+                <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-1 rounded">Rent Control</span>
+                        <span class="text-xs text-slate-400">Housing Act 1988</span>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900">Section 13, Assured Periodic Tenancies</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Landlords cannot raise your rent arbitrarily or via standard text messages during a periodic tenancy. They must serve a formal "Landlord's notice proposing a new rent" using standard **Form 4**. If you object to the proposed rent, you have a statutory right to refer the increase to a First-tier Tribunal before the start date.
+                    </p>
+                    <div class="bg-slate-50 p-3 rounded-lg text-xs font-mono text-slate-600 border border-slate-200">
+                        <strong>Key Ruling:</strong> Rent increases must match general local market valuations. If the hike is excessive, Tribunals will force it back down to market rates.
+                    </div>
+                </div>
+
+                <!-- Statute Card 4 -->
+                <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold uppercase tracking-wider text-rose-600 bg-rose-50 px-2 py-1 rounded">Improvements</span>
+                        <span class="text-xs text-slate-400">Housing Act 1985</span>
+                    </div>
+                    <h3 class="font-bold text-lg text-slate-900">Section 97, Secure Tenant Alterations</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        Secure tenants (such as those in council housing or housing associations) have a legal right to carry out refurbishments or improvements. However, under Section 97, they **must** obtain the landlord's written consent first. The landlord cannot withhold consent unreasonably, but verbal consent holds no weight in dispute proceedings.
+                    </p>
+                    <div class="bg-slate-50 p-3 rounded-lg text-xs font-mono text-slate-600 border border-slate-200">
+                        <strong>Key Ruling:</strong> If a council representative gives verbal permission on the phone, the tenant bears the burden of proof. Always obtain retrospective or initial written agreements.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== LEGAL ADVISOR MATCH TAB ==================== -->
+        <div id="tab-content-advisor" class="space-y-6 tab-panel hidden">
+            <div class="text-center max-w-2xl mx-auto space-y-4">
+                <span class="bg-emerald-50 text-emerald-700 text-xs font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-emerald-200">B2B Legal Aid & Advisory Integration</span>
+                <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Connect with a Housing Lawyer</h1>
+                <p class="text-slate-500 text-sm">
+                    If your dispute has escalated past statutory clocks or your landlord is threatening immediate eviction, you may need professional legal representation. Connect with SRA-regulated solicitor partners who handle TenantGuard exports directly.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
+                <!-- Advisor Option 1 -->
+                <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-emerald-50 text-emerald-600 font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-star mr-1"></i> Highly Rated</span>
+                            <span class="text-xs text-slate-400">Legal Aid Eligible</span>
+                        </div>
+                        <h4 class="font-bold text-md text-slate-900">London Housing Rights Solicitors</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Specialists in Section 11 litigation, environmental health claims, and toxic black mold compensation. Accepts TenantGuard audit logs directly.
+                        </p>
+                    </div>
+                    <button onclick="simulateLegalMatch('London Housing Rights Solicitors')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-3 rounded-lg text-xs transition duration-150">
+                        Package & Export Logs (Request Consultation)
+                    </button>
+                </div>
+
+                <!-- Advisor Option 2 -->
+                <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-blue-50 text-blue-600 font-bold px-2.5 py-1 rounded-full">Eviction Defence</span>
+                            <span class="text-xs text-slate-400">Fixed-Fee packages</span>
+                        </div>
+                        <h4 class="font-bold text-md text-slate-900">Apex Housing & Tenancy Lawyers</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Expert defence against invalid Section 21 notices, illegal evictions, and harassment. Fast-tracked dispute assessments.
+                        </p>
+                    </div>
+                    <button onclick="simulateLegalMatch('Apex Housing & Tenancy Lawyers')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-3 rounded-lg text-xs transition duration-150">
+                        Package & Export Logs (Request Consultation)
+                    </button>
+                </div>
+
+                <!-- Advisor Option 3 -->
+                <div class="bg-white rounded-xl p-6 border border-slate-200 shadow-sm flex flex-col justify-between space-y-4">
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs bg-purple-50 text-purple-600 font-bold px-2.5 py-1 rounded-full">Tribunal Advocates</span>
+                            <span class="text-xs text-slate-400">No Win No Fee</span>
+                        </div>
+                        <h4 class="font-bold text-md text-slate-900">Sovereign Tenant Defense Partners</h4>
+                        <p class="text-xs text-slate-500 leading-relaxed">
+                            Dedicated tribunal advocates specializing in Section 13 rent increase challenges and landlord compensation counter-claims.
+                        </p>
+                    </div>
+                    <button onclick="simulateLegalMatch('Sovereign Tenant Defense Partners')" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-3 rounded-lg text-xs transition duration-150">
+                        Package & Export Logs (Request Consultation)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:flex sm:items-center sm:justify-between space-y-3 sm:space-y-0 text-xs">
+            <p>&copy; 2026 TenantGuard (Social Impact SaaS). All legal templates aligned with UK Housing Legislation.</p>
+            <div class="flex justify-center space-x-4">
+                <a href="#" class="hover:text-white transition duration-150">Privacy Protocol</a>
+                <a href="#" class="hover:text-white transition duration-150">Terms of Protection</a>
+                <a href="#" class="hover:text-white transition duration-150">Helpdesk Support</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Script Logic and State Initialization -->
+    <script>
+        // Core State Object holding mock/in-memory disputes database
+        let state = {
+            currentActiveTab: 'dashboard',
+            disputes: [
+                {
+                    id: 'disp-101',
+                    category: 'repairs',
+                    statute: 'Section 11, Landlord & Tenant Act 1985',
+                    headline: 'Toxic black mold in bathroom corner',
+                    details: 'Severe damp and black toxic mold have spread across the bathroom wall and ceiling. I first raised this verbally with the landlord 3 months ago. Since then, the landlord has ignored all followups. My child is now experiencing respiratory issues.',
+                    tenantName: 'Thomas Anderson',
+                    address: 'Flat 101, Metacortex Towers, London EC1M 4BY',
+                    landlordName: 'Apex Property Managers Ltd',
+                    landlordEmail: 'management@apexproperties.co.uk',
+                    dateStarted: '2026-03-12',
+                    status: 'Awaiting Landlord Response', // Awaiting Landlord, Complied, Disputed, Threatening Eviction
+                    timeline: [
+                        { text: 'Issue Logged on TenantGuard', date: '2026-06-15', status: 'done' },
+                        { text: 'Statute Document Generated (Sec. 11)', date: '2026-06-15', status: 'done' },
+                        { text: 'Sent via Registered Email tracking', date: '2026-06-15', status: 'done' },
+                        { text: 'Statutory 14-day Clock Active', date: '2026-06-15', status: 'active' }
+                    ],
+                    countdownDays: 8, // Remaining days on statutory response clock
+                    hasUploadedEvidence: true,
+                    evidenceFileName: 'mold_damage_photos.jpg',
+                    letterBody: '' // populated on render if blank
+                },
+                {
+                    id: 'disp-102',
+                    category: 'refurb',
+                    statute: 'Section 97, Housing Act 1985',
+                    headline: 'Kitchen cabinets replacement request',
+                    details: 'Requesting permission to carry out kitchen refurbishment works, specifically replacing the deteriorated wooden cabinets and worktops at my own expense. No structural or plumbing alignments are affected.',
+                    tenantName: 'Thomas Anderson',
+                    address: 'Flat 101, Metacortex Towers, London EC1M 4BY',
+                    landlordName: 'Apex Property Managers Ltd',
+                    landlordEmail: 'management@apexproperties.co.uk',
+                    dateStarted: '2026-05-18',
+                    status: 'Consented / Resolved',
+                    timeline: [
+                        { text: 'Refurbishment Request Logged', date: '2026-05-18', status: 'done' },
+                        { text: 'Written Request Sent (Sec. 97)', date: '2026-05-18', status: 'done' },
+                        { text: 'Landlord Replied with Written Consent', date: '2026-05-24', status: 'done' }
+                    ],
+                    countdownDays: 0,
+                    hasUploadedEvidence: false,
+                    evidenceFileName: '',
+                    letterBody: ''
+                }
+            ],
+            draftDispute: null, // holds new dispute before letter activation
+            isEvidenceUploadedMock: false
+        };
+
+        // Window load event listener to initialize app state
+        window.onload = function() {
+            // Seed base template letter contents
+            state.disputes.forEach(dispute => {
+                if (!dispute.letterBody) {
+                    dispute.letterBody = generateLetterTemplate(dispute);
+                }
+            });
+            
+            // Set date inputs to today
+            const dateInput = document.getElementById('form-issue-date');
+            if (dateInput) {
+                const today = new Date().toISOString().split('T')[0];
+                dateInput.value = today;
+            }
+
+            // Render current data to DOM
+            renderDashboard();
+            updateStats();
+        };
+
+        // Formats template letter bodies dynamically based on selected statutes
+        function generateLetterTemplate(data) {
+            const todayDateString = new Date().toLocaleDateString('en-GB', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+
+            if (data.category === 'repairs') {
+                return `FROM:\n${data.tenantName}\n${data.address}\n\nDATE: ${todayDateString}\n\nTO:\n${data.landlordName}\n${data.landlordEmail}\n\nRE: Formal Notice of Urgent Repairs Required Under Section 11 of the Landlord and Tenant Act 1985\n\nDear Sir / Madam,\n\nI am writing to formally notify you of outstanding repair issues affecting my home at the above address. Specifically, the following defect requires your immediate attention:\n\n- ${data.headline}\n- Context details: ${data.details}\n\nAs the landlord, you hold statutory repair obligations under Section 11 of the Landlord and Tenant Act 1985. Section 11 explicitly makes you responsible for keeping in proper repair and working order:\n1. The structure and exterior of the dwelling-house.\n2. Installations for the supply of water, gas, electricity, and sanitation.\n3. Installations for space heating and water heating.\n\nThe toxic damp/mold constitutes a hazard under the Housing Health and Safety Rating System (HHSRS) and is directly impacting our physical health and safe habitation of the property.\n\nPlease reply within 7 days of this letter confirming the date when a certified surveyor or repair technician will attend the flat to resolve the problem. Under standard guidelines, critical damp or heating issues must be attended to within 14 days of written notice.\n\nShould you ignore or fail to act on this statutory request within the 14-day limit, I will have no choice but to escalate this issue to the local council's Environmental Health department, or apply for retrospective repair compensation at the First-tier Tribunal.\n\nI look forward to hearing from you shortly.\n\nYours sincerely,\n\n___________________________\n${data.tenantName}`;
+            } else if (data.category === 'eviction') {
+                return `FROM:\n${data.tenantName}\n${data.address}\n\nDATE: ${todayDateString}\n\nTO:\n${data.landlordName}\n${data.landlordEmail}\n\nRE: Formal Objection to Informal Eviction Notice / Protection Under the Housing Act 1988\n\nDear Sir / Madam,\n\nI am writing regarding the informal communication I received on ${data.dateStarted} requesting that I vacate the property.\n\nI must formally advise you that under UK housing law, specifically the Protection from Eviction Act 1977 and the Housing Act 1988, a landlord cannot evict an assured shorthold tenant without following the strict, mandatory legal procedures. Any attempt to lock me out, harass me, or force me to leave without a court-ordered warrant constitutes a serious criminal offence.\n\nSpecifically, please be advised:\n- A landlord must serve a formal Section 21 notice (providing a minimum of 2 months' notice) or a Section 8 notice (eviction based on specific grounds).\n- For any Section 21 notice to be valid, you must have protected my security deposit in a government-authorized scheme within 30 days of receiving it and provided me with a valid Gas Safety Certificate, an Energy Performance Certificate (EPC), and the current "How to Rent" guide.\n\nPlease confirm in writing within 7 days of this notice that you are retracting any informal demands to vacate, and that you intend to abide by standard statutory legal pathways for any future tenancy decisions.\n\nYours sincerely,\n\n___________________________\n${data.tenantName}`;
+            } else if (data.category === 'rent') {
+                return `FROM:\n${data.tenantName}\n${data.address}\n\nDATE: ${todayDateString}\n\nTO:\n${data.landlordName}\n${data.landlordEmail}\n\nRE: Formal Objection to Proposed Rent Increase Under Section 13 of the Housing Act 1988\n\nDear Sir / Madam,\n\nI am writing in response to your notice/communication proposing to increase my rent to a new rate.\n\nI must formally advise you that under Section 13 of the Housing Act 1988, a landlord cannot raise the rent of an assured periodic tenancy arbitrarily. To enact a valid rent increase, you are legally required to serve a formal **Form 4 Notice** (Landlord's notice proposing a new rent).\n\nThe proposed increase does not align with general local market valuations. Under Section 13 rules, I have a statutory right to refer any proposed rent increase to the First-tier Tribunal (Property Chamber) for an independent market assessment before the proposed start date.\n\nI would like to propose a mutually acceptable compromise of [insert proposedcompromise figure] instead. If this is not acceptable, I will have no option but to refer your proposal to the First-tier Tribunal for a binding market valuation.\n\nPlease reply within 7 days confirming whether you agree to negotiate this compromise or if you intend to withdraw the proposed increase.\n\nYours sincerely,\n\n___________________________\n${data.tenantName}`;
+            } else if (data.category === 'refurb') {
+                return `FROM:\n${data.tenantName}\n${data.address}\n\nDATE: ${todayDateString}\n\nTO:\n${data.landlordName}\n${data.landlordEmail}\n\nRE: Statutory Request for Written Consent to Carry Out Alterations Under Section 97 of the Housing Act 1985\n\nDear Sir / Madam,\n\nI am writing to formally request your written consent to carry out improvements/alterations at my home at the above address. Specifically, I plan to carry out the following works at my own expense:\n\n- Description: ${data.details}\n\nUnder Section 97 of the Housing Act 1985, a secure tenant is entitled to make alterations, subject to obtaining the landlord's prior written consent. The statute explicitly states that the landlord must not withhold consent unreasonably.\n\nThe proposed works do not alter structural boundaries, compromise ventilation, affect fire exits, or damage plumbing/gas networks. The work will be carried out by fully qualified professionals to a high standard, enhancing the overall value of the asset.\n\nAs verbal permission holds no standing under Section 97 guidelines, please reply in writing (or via email) within 7 days of this letter confirming that the council/agency grants consent for these works to proceed.\n\nThank you for your cooperation.\n\nYours sincerely,\n\n___________________________\n${data.tenantName}`;
+            }
+            return '';
+        }
+
+        // Tab switching utility
+        function switchTab(tabId) {
+            // Hide all tab panels
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.add('hidden');
+            });
+
+            // Deactivate all tab headers
+            document.querySelectorAll('.nav-tab').forEach(header => {
+                header.classList.remove('active', 'text-white', 'bg-slate-800');
+                header.classList.add('text-slate-300');
+            });
+
+            // Show active panel
+            const activePanel = document.getElementById(`tab-content-${tabId}`);
+            if (activePanel) {
+                activePanel.classList.remove('hidden');
+            }
+
+            // Highlight active header
+            const activeHeader = document.getElementById(`tab-${tabId}`);
+            if (activeHeader) {
+                activeHeader.classList.add('active', 'text-white', 'bg-slate-800');
+                activeHeader.classList.remove('text-slate-300');
+            }
+
+            state.currentActiveTab = tabId;
+        }
+
+        // Simulates a secure file upload locally for user realism
+        function simulateFileUpload() {
+            state.isEvidenceUploadedMock = true;
+            document.getElementById('upload-status').classList.remove('hidden');
+            showToast('Evidence Loaded', 'Photos of physical damage successfully attached to the dispute metadata.', 'success');
+        }
+
+        // Handles submission of the Log Issue Wizard
+        function handleNewDisputeSubmit(event) {
+            event.preventDefault();
+
+            const category = document.querySelector('input[name="category"]:checked').value;
+            const tenantName = document.getElementById('form-tenant-name').value;
+            const address = document.getElementById('form-address').value;
+            const landlordName = document.getElementById('form-landlord-name').value;
+            const landlordEmail = document.getElementById('form-landlord-email').value;
+            const dateStarted = document.getElementById('form-issue-date').value;
+            const headline = document.getElementById('form-headline').value;
+            const details = document.getElementById('form-details').value;
+
+            // Map category to legal statutes
+            let statute = '';
+            if (category === 'repairs') statute = 'Section 11, Landlord & Tenant Act 1985';
+            else if (category === 'eviction') statute = 'Section 21 / Section 8 Protection';
+            else if (category === 'rent') statute = 'Section 13, Housing Act 1988';
+            else if (category === 'refurb') statute = 'Section 97, Housing Act 1985';
+
+            const newDisputeDraft = {
+                id: 'disp-' + Date.now(),
+                category: category,
+                statute: statute,
+                headline: headline,
+                details: details,
+                tenantName: tenantName,
+                address: address,
+                landlordName: landlordName,
+                landlordEmail: landlordEmail,
+                dateStarted: dateStarted,
+                status: 'Drafting Document',
+                timeline: [
+                    { text: 'Issue Logged on TenantGuard', date: new Date().toISOString().split('T')[0], status: 'done' },
+                    { text: 'Statute Document Draft Generated', date: new Date().toISOString().split('T')[0], status: 'active' }
+                ],
+                countdownDays: 14, // default statutory limit
+                hasUploadedEvidence: state.isEvidenceUploadedMock,
+                evidenceFileName: state.isEvidenceUploadedMock ? 'user_uploaded_evidence.jpg' : '',
+                letterBody: ''
+            };
+
+            // Generate template body
+            newDisputeDraft.letterBody = generateLetterTemplate(newDisputeDraft);
+
+            // Save draft to state
+            state.draftDispute = newDisputeDraft;
+
+            // Render document editor screen
+            document.getElementById('editable-doc-box').innerText = newDisputeDraft.letterBody;
+            document.getElementById('doc-view-statute').innerText = statute;
+
+            // Switch to Document tab
+            switchTab('doc-viewer');
+        }
+
+        // Activates the statutory countdown and pushes draft to live dashboard
+        function activateDisputeClock() {
+            if (!state.draftDispute) return;
+
+            // Update letter body with any manual edits user made in the contenteditable container
+            state.draftDispute.letterBody = document.getElementById('editable-doc-box').innerText;
+            state.draftDispute.status = 'Awaiting Landlord Response';
+            
+            // Advance active timeline milestone
+            state.draftDispute.timeline[1].status = 'done';
+            state.draftDispute.timeline.push({ text: 'Letter Sent via Registered Email', date: new Date().toISOString().split('T')[0], status: 'done' });
+            state.draftDispute.timeline.push({ text: 'Statutory Response Clock Active', date: new Date().toISOString().split('T')[0], status: 'active' });
+
+            // Push into main collection
+            state.disputes.unshift(state.draftDispute);
+
+            // Reset drafts
+            state.draftDispute = null;
+            state.isEvidenceUploadedMock = false;
+            document.getElementById('upload-status').classList.add('hidden');
+            document.getElementById('dispute-form').reset();
+
+            // Notify user and return to dashboard
+            showToast('Statutory Clock Active!', 'Formal statutory letter sent via registered email. Response tracker activated on dashboard.', 'success');
+            
+            renderDashboard();
+            updateStats();
+            switchTab('dashboard');
+        }
+
+        // Core rendering engine for the dashboard
+        function renderDashboard() {
+            const listContainer = document.getElementById('disputes-list-container');
+            const selectContainer = document.getElementById('simulator-target-id');
+            
+            if (!listContainer) return;
+
+            // Clear existing elements
+            listContainer.innerHTML = '';
+            selectContainer.innerHTML = '';
+
+            if (state.disputes.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="bg-white rounded-xl p-8 border border-slate-200 text-center shadow-sm">
+                        <i class="fa-solid fa-folder-open text-4xl text-slate-300"></i>
+                        <h4 class="font-bold text-slate-800 text-lg mt-3">No housing disputes logged</h4>
+                        <p class="text-xs text-slate-500 mt-1 max-w-sm mx-auto">Get started by documenting your current issue or alteration request to create a protective paper trail.</p>
+                        <button onclick="switchTab('new-dispute')" class="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg text-xs mt-4">
+                            Log New Issue Now
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            state.disputes.forEach(dispute => {
+                // Determine CSS badge classes based on status
+                let badgeClass = '';
+                if (dispute.status === 'Awaiting Landlord Response') {
+                    badgeClass = 'bg-amber-50 text-amber-700 border-amber-200';
+                } else if (dispute.status === 'Consented / Resolved') {
+                    badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                } else if (dispute.status === 'Landlord Objections Raised') {
+                    badgeClass = 'bg-blue-50 text-blue-700 border-blue-200';
+                } else if (dispute.status === 'Eviction Threat Action') {
+                    badgeClass = 'bg-rose-50 text-rose-700 border-rose-200 animate-pulse';
+                }
+
+                // Append select option for simulator target
+                const option = document.createElement('option');
+                option.value = dispute.id;
+                option.text = `${dispute.headline} (Status: ${dispute.status})`;
+                selectContainer.appendChild(option);
+
+                // Build timelines dynamically
+                let timelineHtml = '';
+                dispute.timeline.forEach(milestone => {
+                    let iconClass = '';
+                    let textClass = '';
+                    if (milestone.status === 'done') {
+                        iconClass = 'fa-solid fa-circle-check text-emerald-500';
+                        textClass = 'text-slate-500 line-through';
+                    } else if (milestone.status === 'active') {
+                        iconClass = 'fa-solid fa-spinner text-amber-500 animate-spin';
+                        textClass = 'text-slate-900 font-semibold';
+                    } else {
+                        iconClass = 'fa-regular fa-circle text-slate-300';
+                        textClass = 'text-slate-400';
+                    }
+
+                    timelineHtml += `
+                        <div class="flex items-center space-x-2 text-[11px] py-1">
+                            <i class="${iconClass}"></i>
+                            <span class="${textClass}">${milestone.text}</span>
+                            <span class="text-[9px] text-slate-400 font-mono ml-auto">${milestone.date}</span>
+                        </div>
+                    `;
+                });
+
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition duration-200 overflow-hidden';
+                card.innerHTML = `
+                    <div class="p-6 space-y-4">
+                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 border-b border-slate-100 pb-4">
+                            <div>
+                                <span class="text-[10px] font-bold tracking-widest uppercase text-emerald-600 block mb-1 font-mono">${dispute.statute}</span>
+                                <h4 class="font-bold text-lg text-slate-900">${dispute.headline}</h4>
+                                <span class="text-xs text-slate-500 block mt-1"><i class="fa-solid fa-location-dot mr-1 text-slate-400"></i> ${dispute.address}</span>
+                            </div>
+                            <span class="self-start inline-flex items-center text-xs font-semibold px-2.5 py-1 rounded-full border ${badgeClass}">
+                                <span class="w-1.5 h-1.5 rounded-full ${dispute.status === 'Awaiting Landlord Response' ? 'bg-amber-400' : (dispute.status === 'Consented / Resolved' ? 'bg-emerald-500' : 'bg-rose-500')} mr-1.5"></span>
+                                ${dispute.status}
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Left col: statutory clock & details -->
+                            <div class="space-y-3">
+                                <p class="text-xs text-slate-500 leading-relaxed max-h-[100px] overflow-y-auto pr-1">
+                                    ${dispute.details}
+                                </p>
+                                
+                                ${dispute.hasUploadedEvidence ? `
+                                    <div class="inline-flex items-center bg-slate-100 text-slate-700 text-[10px] px-2.5 py-1 rounded-full border border-slate-200">
+                                        <i class="fa-solid fa-paperclip mr-1.5 text-slate-500"></i> Attached: ${dispute.evidenceFileName}
+                                    </div>
+                                ` : ''}
+
+                                <!-- Statutory countdown clock -->
+                                ${dispute.countdownDays > 0 ? `
+                                    <div class="bg-amber-50 rounded-xl p-4 border border-amber-200 flex items-center justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <div class="text-amber-500 text-2xl animate-pulse">
+                                                <i class="fa-solid fa-clock"></i>
+                                            </div>
+                                            <div>
+                                                <span class="block text-[10px] font-bold text-amber-800 uppercase tracking-wide">Statutory response clock</span>
+                                                <span class="block text-xl font-bold text-slate-900">${dispute.countdownDays} Days Remaining</span>
+                                            </div>
+                                        </div>
+                                        <span class="text-[10px] bg-amber-100 text-amber-800 border border-amber-300 px-2 py-0.5 rounded font-bold uppercase">Awaiting</span>
+                                    </div>
+                                ` : `
+                                    <div class="bg-emerald-50 rounded-xl p-4 border border-emerald-200 flex items-center space-x-3">
+                                        <div class="text-emerald-500 text-2xl">
+                                            <i class="fa-solid fa-circle-check"></i>
+                                        </div>
+                                        <div>
+                                            <span class="block text-[10px] font-bold text-emerald-800 uppercase tracking-wide">Statutory status</span>
+                                            <span class="block text-sm font-bold text-slate-900">${dispute.status === 'Consented / Resolved' ? 'Tenancy Alteration Authorized' : 'Clock Paused / Escalation Ready'}</span>
+                                        </div>
+                                    </div>
+                                `}
+                            </div>
+
+                            <!-- Right col: visual audit trail -->
+                            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100 flex flex-col justify-between">
+                                <div>
+                                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Audit Trail Timeline</span>
+                                    <div class="space-y-1 divide-y divide-slate-100">
+                                        ${timelineHtml}
+                                    </div>
+                                </div>
+
+                                <div class="flex space-x-2 pt-4">
+                                    <button onclick="viewActiveDocument('${dispute.id}')" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-3 rounded-lg text-xs transition duration-150 flex items-center justify-center">
+                                        <i class="fa-solid fa-file-invoice mr-1.5 text-emerald-500"></i> View Letter
+                                    </button>
+                                    ${dispute.countdownDays === 0 && dispute.status !== 'Consented / Resolved' ? `
+                                        <button onclick="triggerEscalation('${dispute.id}')" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2 px-3 rounded-lg text-xs transition duration-150 flex items-center justify-center">
+                                            <i class="fa-solid fa-triangle-exclamation mr-1.5"></i> Escalate to Council
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        // Action simulator handler adapting local state to represent landlord reactions
+        function triggerSimulatorAction(action) {
+            const select = document.getElementById('simulator-target-id');
+            const targetId = select.value;
+            if (!targetId) return;
+
+            const dispute = state.disputes.find(d => d.id === targetId);
+            if (!dispute) return;
+
+            const dateStr = new Date().toISOString().split('T')[0];
+
+            if (action === 'comply') {
+                dispute.status = 'Consented / Resolved';
+                dispute.countdownDays = 0;
+                dispute.timeline[dispute.timeline.length - 1].status = 'done';
+                dispute.timeline.push({ text: 'Resolution / Permission Confirmed in Writing', date: dateStr, status: 'done' });
+                showToast('Landlord Complied!', 'Landlord officially confirmed compliance. Timeline updated to Resolved.', 'success');
+            } else if (action === 'ignore') {
+                dispute.status = 'Awaiting Landlord Response';
+                dispute.countdownDays = 0; // trigger zero-clock instantly to mock expiration
+                dispute.timeline[dispute.timeline.length - 1].status = 'done';
+                dispute.timeline.push({ text: 'Statutory deadline expired with no response', date: dateStr, status: 'active' });
+                showToast('Landlord Ignored Notice', 'Deadline elapsed with zero landlord activity. Council escalation unlocked.', 'warning');
+            } else if (action === 'object') {
+                dispute.status = 'Landlord Objections Raised';
+                dispute.countdownDays = 3; // force low countdown to simulate action required
+                dispute.timeline[dispute.timeline.length - 1].status = 'done';
+                dispute.timeline.push({ text: 'Official Landlord Objection Received', date: dateStr, status: 'active' });
+                showToast('Objected Received', 'Landlord has officially disputed terms. Access match platform to consult a solicitor.', 'warning');
+            } else if (action === 'threaten') {
+                dispute.status = 'Eviction Threat Action';
+                dispute.countdownDays = 0;
+                dispute.timeline[dispute.timeline.length - 1].status = 'done';
+                dispute.timeline.push({ text: 'Illegal informal eviction threat logged', date: dateStr, status: 'active' });
+                showToast('CRITICAL: Eviction Threat!', 'Retaliatory eviction / harassment detected. B2B legal assistance recommended immediately.', 'critical');
+            }
+
+            renderDashboard();
+            updateStats();
+        }
+
+        // Visualizes a mock legal case package transfer to partner solicitor firms
+        function simulateLegalMatch(solicitorName) {
+            showToast('Packaging Complete', `All timestamped audit trails and PDF letter records exported safely to ${solicitorName}. They will contact you within 24 hours.`, 'success');
+        }
+
+        // Allows viewing previously generated letters in the document viewport tab
+        function viewActiveDocument(disputeId) {
+            const dispute = state.disputes.find(d => d.id === disputeId);
+            if (!dispute) return;
+
+            document.getElementById('editable-doc-box').innerText = dispute.letterBody;
+            document.getElementById('doc-view-statute').innerText = dispute.statute;
+            switchTab('doc-viewer');
+        }
+
+        // Triggers environmental health escalation packet creation
+        function triggerEscalation(disputeId) {
+            const dispute = state.disputes.find(d => d.id === disputeId);
+            if (!dispute) return;
+
+            const escalationReportText = `--- OFFICIAL HOUSING HAZARD COMPLAINT PACKAGE ---\n\nSUBMITTED TO: Local Council Environmental Health Dept.\n\nCOMPLAINANT:\nName: ${dispute.tenantName}\nAddress: ${dispute.address}\n\nTARGET LANDLORD:\nName: ${dispute.landlordName}\nEmail: ${dispute.landlordEmail}\n\nHazard category identified: ${dispute.headline}\nDetails: ${dispute.details}\n\nAUDIT TRAIL LOGGED:\n1. Written statutory notice served under ${dispute.statute}.\n2. Formal delivery reference sent, with zero compliance action.\n3. Statutory grace period expired with zero mitigation.\n\nEvidence of tenant good-faith communication attached. Please schedule an emergency Environmental Health inspection under the HHSRS framework.`;
+
+            // Display in viewer
+            document.getElementById('editable-doc-box').innerText = escalationReportText;
+            document.getElementById('doc-view-statute').innerText = 'Local Authority Complaint';
+            switchTab('doc-viewer');
+            
+            showToast('Complaint Generated', 'Council Environmental Health Complaint pack generated. Copy and send directly to local authorities.', 'success');
+        }
+
+        // Copy mechanism using reliable fallback to support browser iframe sandboxes
+        function copyDocToClipboard() {
+            const textToCopy = document.getElementById('editable-doc-box').innerText;
+            
+            // Build temporary element for copy trigger fallback
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            textarea.style.position = 'fixed'; // prevent scrolling to bottom
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    showToast('Copied to Clipboard!', 'Legal letter copied. Paste it into your email client to send to your landlord.', 'success');
+                } else {
+                    showToast('Copy Failed', 'Please select and copy the text manually inside the box.', 'warning');
+                }
+            } catch (err) {
+                showToast('Copy Failed', 'Please select and copy the text manually inside the box.', 'warning');
+            }
+            
+            document.body.removeChild(textarea);
+        }
+
+        // Core metric calculation updates for stats display
+        function updateStats() {
+            let active = 0;
+            let resolved = 0;
+            let sent = 0;
+            let escalated = 0;
+
+            state.disputes.forEach(dispute => {
+                if (dispute.status === 'Consented / Resolved') {
+                    resolved++;
+                } else {
+                    active++;
+                }
+
+                if (dispute.status === 'Eviction Threat Action' || dispute.countdownDays === 0 && dispute.status !== 'Consented / Resolved') {
+                    escalated++;
+                }
+
+                if (dispute.timeline.some(m => m.text.includes('Sent') || m.text.includes('sent'))) {
+                    sent++;
+                }
+            });
+
+            document.getElementById('stat-active').innerText = active;
+            document.getElementById('stat-resolved').innerText = resolved;
+            document.getElementById('stat-sent').innerText = sent;
+            document.getElementById('stat-escalated').innerText = escalated;
+        }
+
+        // Custom notification banner helper
+        function showToast(title, message, type = 'success') {
+            const toast = document.getElementById('toast-banner');
+            const toastTitle = document.getElementById('toast-title');
+            const toastMessage = document.getElementById('toast-message');
+
+            toastTitle.innerText = title;
+            toastMessage.innerText = message;
+
+            // Remove previous borders
+            toast.className = toast.className.replace(/border-l-4 border-\w+-500/, '');
+
+            if (type === 'success') {
+                toast.classList.add('border-emerald-500');
+            } else if (type === 'warning') {
+                toast.classList.add('border-amber-500');
+            } else if (type === 'critical') {
+                toast.classList.add('border-rose-500');
+            }
+
+            toast.classList.remove('hidden');
+
+            // Hide automatically after 5 seconds
+            setTimeout(() => {
+                hideToast();
+            }, 5500);
+        }
+
+        function hideToast() {
+            document.getElementById('toast-banner').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
